@@ -1,1 +1,13 @@
-{ "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }] }
+{
+  "routes": [
+    { "src": "/[^.]+", "dest": "/", "status": 200 }
+  ],
+  "build": {
+    "env": {
+      "VITE_NODE_ENV": "production"
+    }
+  },
+  "env": {
+    "VITE_API_BASE_URL": "@vite_api_base_url"
+  }
+}
