@@ -39,10 +39,16 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('API Error:', error.config?.url, error.response?.status, error.message);
-    if (error.response?.status === 401) {
+    const url = error.config?.url || '';
+    const status = error.response?.status;
+    console.error('API Error:', url, status, error.message);
+    const shouldForceLogout = status === 401 && (/^\/auth\//.test(url) || url === '/auth/profile');
+    if (shouldForceLogout) {
       Cookies.remove('token');
-      window.location.href = '/login';
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
