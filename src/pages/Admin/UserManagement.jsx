@@ -38,10 +38,38 @@ const UserManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [learnersPagination, setLearnersPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [creatorsPagination, setCreatorsPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [learnersTotal, setLearnersTotal] = useState(0);
+  const [creatorsTotal, setCreatorsTotal] = useState(0);
 
   useEffect(() => {
     fetchUsers();
   }, [activeTab, searchTerm, statusFilter, learnersPagination.page, creatorsPagination.page]);
+
+  // Fetch totals for both tabs on mount and when filters change
+  useEffect(() => {
+    const fetchTotals = async () => {
+      try {
+        const baseParams = {
+          page: 1,
+          limit: 1,
+          search: searchTerm,
+          status: statusFilter === 'all' ? undefined : statusFilter
+        };
+        const [learnersRes, creatorsRes] = await Promise.all([
+          adminAPI.getAllLearners(baseParams),
+          adminAPI.getAllCreators(baseParams)
+        ]);
+        setLearnersTotal(learnersRes.data.data.pagination?.total || 0);
+        setCreatorsTotal(creatorsRes.data.data.pagination?.total || 0);
+        // Also sync totals into paginations without altering pages
+        setLearnersPagination(prev => ({ ...prev, total: learnersRes.data.data.pagination?.total || prev.total }));
+        setCreatorsPagination(prev => ({ ...prev, total: creatorsRes.data.data.pagination?.total || prev.total }));
+      } catch (e) {
+        // ignore totals error silently
+      }
+    };
+    fetchTotals();
+  }, [searchTerm, statusFilter]);
 
   const fetchUsers = async () => {
     try {
@@ -291,7 +319,10 @@ const UserManagement = () => {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               <button
-                onClick={() => setActiveTab('learners')}
+                onClick={() => {
+                  setActiveTab('learners');
+                  setLearnersPagination(prev => ({ ...prev, page: 1 }));
+                }}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'learners'
                     ? 'border-blue-500 text-blue-600'
@@ -300,11 +331,14 @@ const UserManagement = () => {
               >
                 <div className="flex items-center space-x-2">
                   <GraduationCap className="h-4 w-4" />
-                  <span>Learners ({learnersPagination.total})</span>
+                  <span>Learners ({learnersTotal})</span>
                 </div>
               </button>
               <button
-                onClick={() => setActiveTab('creators')}
+                onClick={() => {
+                  setActiveTab('creators');
+                  setCreatorsPagination(prev => ({ ...prev, page: 1 }));
+                }}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'creators'
                     ? 'border-blue-500 text-blue-600'
@@ -313,7 +347,7 @@ const UserManagement = () => {
               >
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4" />
-                  <span>Creators ({creatorsPagination.total})</span>
+                  <span>Creators ({creatorsTotal})</span>
                 </div>
               </button>
             </nav>
