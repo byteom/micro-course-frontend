@@ -129,6 +129,10 @@ const Register = () => {
 
         {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+          {/* Demo Admin Credentials Notice */}
+          <div className="mb-4 p-3 rounded-md bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+            <strong>Demo Admin:</strong> Email: <code>admin@mail.com</code> · Password: <code>admin123</code>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name Field */}
             <div className="space-y-2">
