@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Loader from '../../components/Loader';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Users, 
@@ -348,9 +349,7 @@ const UserManagement = () => {
         {/* Users Table */}
         <div className="bg-white shadow rounded-lg">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
+            <Loader label="Loading users..." />
           ) : (
             <>
               {renderUserTable(activeTab === 'learners' ? learners : creators, activeTab === 'learners')}

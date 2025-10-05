@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Loader from '../../components/Loader';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import { 
@@ -44,10 +45,9 @@ const CourseReview = () => {
     try {
       setLoading(true);
       
-      // Fetch course details
+      // Potentially fetch related data in parallel in the future
       const courseResponse = await adminAPI.getCourseDetails(id);
       const courseData = courseResponse.data.data;
-      
       setCourse(courseData);
       setCreator(courseData.creator);
       setLessons(courseData.lessons || []);
@@ -133,7 +133,7 @@ const CourseReview = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <Loader label="Loading course details..." size={48} />
       </div>
     );
   }

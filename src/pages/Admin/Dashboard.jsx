@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Users, 
   BookOpen, 
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminAPI } from '../../services/api';
+import Loader from '../../components/Loader';
 import { Link, useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -45,23 +46,24 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch admin dashboard data
-      console.log('Fetching admin dashboard data...');
-      const response = await adminAPI.getDashboardStats();
-      console.log('Dashboard API response:', response.data);
-      const data = response.data.data;
-      
+      // Fetch data in parallel to reduce TTFB
+      const [statsRes, applicationsRes, coursesRes] = await Promise.all([
+        adminAPI.getDashboardStats(),
+        adminAPI.getCreatorApplications(),
+        adminAPI.getPendingCourses()
+      ]);
+
+      const data = statsRes.data.data;
       setStats({
         totalUsers: data.statistics?.totalUsers || 0,
         totalCourses: data.statistics?.totalCourses || 0,
         totalRevenue: data.statistics?.totalRevenue || 0,
         pendingApplications: data.statistics?.pendingCreatorApplications || 0
       });
-      
-      setRecentActivity(data.recentActivity || {});
-      
-      // Fetch pending applications and creators
-      await fetchPendingData();
+
+      setRecentActivity(data.recentActivity || []);
+      setPendingApplications(applicationsRes.data.data || []);
+      setPendingCreators(coursesRes.data.data || []);
       
       console.log('Dashboard data set:', {
         totalUsers: data.statistics?.totalUsers || 0,
@@ -350,7 +352,7 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600"></div>
+        <Loader label="Loading admin dashboard..." size={48} />
       </div>
     );
   }
