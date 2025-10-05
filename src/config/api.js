@@ -8,9 +8,8 @@ const getApiBaseUrl = () => {
     return 'http://localhost:5000/api';
   }
 
-  // In production, require explicit configuration
-  console.error('API base URL is not configured. Set VITE_API_BASE_URL.');
-  return '';
+  // In production, use relative path so rewrites proxy to backend
+  return '/api';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

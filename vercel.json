@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://micorcourses-backend.onrender.com/api/$1" }
+  ],
   "routes": [
     { "src": "/[^.]+", "dest": "/", "status": 200 }
   ]
