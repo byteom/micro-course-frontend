@@ -19,7 +19,9 @@ const api = axios.create({
 // Request interceptor to add token
 api.interceptors.request.use(
   (config) => {
-    const token = Cookies.get('token');
+    const cookieToken = Cookies.get('token');
+    const lsToken = typeof window !== 'undefined' ? window.localStorage.getItem('token') : null;
+    const token = cookieToken || lsToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

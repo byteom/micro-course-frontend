@@ -45,7 +45,9 @@ export const AuthProvider = ({ children }) => {
   // Check if user is logged in on app start
   useEffect(() => {
     const checkAuth = async () => {
-      const token = Cookies.get('token');
+      const cookieToken = Cookies.get('token');
+      const lsToken = typeof window !== 'undefined' ? window.localStorage.getItem('token') : null;
+      const token = cookieToken || lsToken;
       console.log('Checking auth, token exists:', !!token);
       console.log('Token value:', token ? token.substring(0, 20) + '...' : 'none');
       
@@ -59,6 +61,9 @@ export const AuthProvider = ({ children }) => {
           console.error('Auth check failed:', error.response?.status, error.response?.data?.message || error.message);
           console.log('Removing invalid token and logging out');
           Cookies.remove('token');
+          if (typeof window !== 'undefined') {
+            window.localStorage.removeItem('token');
+          }
           dispatch({ type: 'LOGOUT' });
         }
       } else {
@@ -79,9 +84,13 @@ export const AuthProvider = ({ children }) => {
       console.log('User role:', user.role);
       // Store token in cookie
       Cookies.set('token', token, { expires: 30 });
+      // Also store in localStorage as a fallback for cross-site cookie issues
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('token', token);
+      }
       
       // Verify token was stored
-      const storedToken = Cookies.get('token');
+      const storedToken = Cookies.get('token') || (typeof window !== 'undefined' ? window.localStorage.getItem('token') : null);
       console.log('Token stored successfully:', !!storedToken);
       
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
@@ -102,6 +111,10 @@ export const AuthProvider = ({ children }) => {
       
       // Store token in cookie
       Cookies.set('token', token, { expires: 30 });
+      // And in localStorage fallback
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('token', token);
+      }
       
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
       toast.success('Registration successful!');
@@ -120,6 +133,9 @@ export const AuthProvider = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       Cookies.remove('token');
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('token');
+      }
       dispatch({ type: 'LOGOUT' });
       toast.success('Logged out successfully');
     }
