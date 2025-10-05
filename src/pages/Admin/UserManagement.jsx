@@ -36,17 +36,19 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [learnersPagination, setLearnersPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [creatorsPagination, setCreatorsPagination] = useState({ page: 1, pages: 1, total: 0 });
 
   useEffect(() => {
     fetchUsers();
-  }, [activeTab, searchTerm, statusFilter]);
+  }, [activeTab, searchTerm, statusFilter, learnersPagination.page, creatorsPagination.page]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
+      const currentPage = activeTab === 'learners' ? learnersPagination.page : creatorsPagination.page;
       const params = {
-        page: pagination.page,
+        page: currentPage,
         limit: 10,
         search: searchTerm,
         status: statusFilter === 'all' ? undefined : statusFilter
@@ -55,11 +57,11 @@ const UserManagement = () => {
       if (activeTab === 'learners') {
         const response = await adminAPI.getAllLearners(params);
         setLearners(response.data.data.learners);
-        setPagination(response.data.data.pagination);
+        setLearnersPagination(response.data.data.pagination);
       } else {
         const response = await adminAPI.getAllCreators(params);
         setCreators(response.data.data.creators);
-        setPagination(response.data.data.pagination);
+        setCreatorsPagination(response.data.data.pagination);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -298,7 +300,7 @@ const UserManagement = () => {
               >
                 <div className="flex items-center space-x-2">
                   <GraduationCap className="h-4 w-4" />
-                  <span>Learners ({pagination.total})</span>
+                  <span>Learners ({learnersPagination.total})</span>
                 </div>
               </button>
               <button
@@ -311,7 +313,7 @@ const UserManagement = () => {
               >
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4" />
-                  <span>Creators ({pagination.total})</span>
+                  <span>Creators ({creatorsPagination.total})</span>
                 </div>
               </button>
             </nav>
@@ -355,22 +357,30 @@ const UserManagement = () => {
               {renderUserTable(activeTab === 'learners' ? learners : creators, activeTab === 'learners')}
               
               {/* Pagination */}
-              {pagination.pages > 1 && (
+              {(activeTab === 'learners' ? learnersPagination.pages : creatorsPagination.pages) > 1 && (
                 <div className="px-6 py-3 border-t border-gray-200 flex items-center justify-between">
                   <div className="text-sm text-gray-700">
-                    Showing page {pagination.page} of {pagination.pages}
+                    {activeTab === 'learners'
+                      ? `Showing page ${learnersPagination.page} of ${learnersPagination.pages}`
+                      : `Showing page ${creatorsPagination.page} of ${creatorsPagination.pages}`}
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => setPagination({...pagination, page: pagination.page - 1})}
-                      disabled={pagination.page === 1}
+                      onClick={() => activeTab === 'learners'
+                        ? setLearnersPagination({ ...learnersPagination, page: learnersPagination.page - 1 })
+                        : setCreatorsPagination({ ...creatorsPagination, page: creatorsPagination.page - 1 })}
+                      disabled={(activeTab === 'learners' ? learnersPagination.page : creatorsPagination.page) === 1}
                       className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
                     >
                       Previous
                     </button>
                     <button
-                      onClick={() => setPagination({...pagination, page: pagination.page + 1})}
-                      disabled={pagination.page === pagination.pages}
+                      onClick={() => activeTab === 'learners'
+                        ? setLearnersPagination({ ...learnersPagination, page: learnersPagination.page + 1 })
+                        : setCreatorsPagination({ ...creatorsPagination, page: creatorsPagination.page + 1 })}
+                      disabled={(activeTab === 'learners'
+                        ? learnersPagination.page === learnersPagination.pages
+                        : creatorsPagination.page === creatorsPagination.pages)}
                       className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
                     >
                       Next
