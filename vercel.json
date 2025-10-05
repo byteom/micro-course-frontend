@@ -1,8 +1,7 @@
 {
+  "version": 2,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://micorcourses-backend.onrender.com/api/$1" }
-  ],
-  "routes": [
-    { "src": "/[^.]+", "dest": "/", "status": 200 }
+    { "source": "/api/(.*)", "destination": "https://micorcourses-backend.onrender.com/api/$1" },
+    { "source": "/((?!assets|api).*)", "destination": "/" }
   ]
 }
