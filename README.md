@@ -27,7 +27,7 @@ A modern React frontend for the MicroCourses Learning Management System.
 - **Success Green**: `#16a34a` (green-600)
 - **Background**: `#f9fafb` (gray-50)
 - **Text**: `#111827` (gray-900)
-- **Secondary Text**: `#6b7280` (grayu-500)
+- **Secondary Text**: `#6b7280` (gray-500)
 
 ## Project Structure
 
