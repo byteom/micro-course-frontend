@@ -15,7 +15,7 @@ const getApiBaseUrl = () => {
 
 export const API_BASE_URL = getApiBaseUrl();
 
-// Minimal logging without exposing secrets/URLs in production
+// Minimal logging without exposing secrets/URLs in
 if (import.meta.env.DEV) {
   console.log('API configured for development');
 }
