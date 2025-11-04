@@ -5,7 +5,7 @@ const getApiBaseUrl = () => {
 
   // Safe fallback for local development only
   if (import.meta.env.DEV) {
-    return 'http://localhost:5000/api';
+    return 'http://localhost:4001/api';
   }
 
   // In production, use relative path so rewrites proxy to backend
